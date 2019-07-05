@@ -1,7 +1,12 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.views.generic import View
+from django.http import HttpResponse
+from django.conf import settings
+
 from user.models import User
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import SignatureExpired
 import re
 
 
@@ -91,10 +96,12 @@ def register_handle(request):
     user.is_active = 0  # 用户未激活的状态
     user.save()
 
+    #
     # 返回应答 跳转到首页
     return redirect(reverse('goods:index'))
 
 
+# 通过不同的请求方式调用该类里面不同的方法
 class RegisterView(View):
     # 注册页面展示
     def get(self, request):
@@ -137,5 +144,43 @@ class RegisterView(View):
         user.is_active = 0  # 用户未激活的状态
         user.save()
 
+        # 发送激活邮件，包含激活链接: http://127.0.0.1:8000/user/active/3
+        # 激活链接中需要包含用户的身份信息, 并且要把身份信息进行加密
+
+        # 加密用户的身份信息，生成激活token
+        serializer = Serializer(settings.SECRET_KEY, 3600)
+        info = {'confirm': user.id}
+        token = serializer.dump(info)
+
+        # 发邮件 pass
+
         # 返回应答 跳转到首页
         return redirect(reverse('goods:index'))
+
+
+class ActiveView(View):
+    # 用户点击激活
+    def get(self, request, token):
+        # '进行解密 获取要激活的用户信息'
+        serializer = Serializer(settings.SECRET_KEY, 3600)
+        try:
+            info = serializer.loads(token)
+            # 获取激活用户的id
+            user_id = info['confirm']
+
+            # 根据id获取用户信息
+            user = User.objects.get(id=user_id)
+            user.is_active = 1
+            user.save()
+
+            # 跳转到登录页面
+            return redirect(reverse('user:login'))
+        except SignatureExpired as e:
+            # 激活链接已过期
+            return HttpResponse('激活链接已过期')
+
+
+class LoginView(View):
+    # 登录展示页
+    def get(self, request):
+        return render(request, 'login.html')

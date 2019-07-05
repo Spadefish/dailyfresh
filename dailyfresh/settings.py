@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'tinymce',  # 富文本编辑器
     'user',  # 用户模块
     'goods',  # 商品模块
     'cart',  # 购物车模块
@@ -89,6 +90,11 @@ DATABASES = {
     }
 }
 
+# django认证系统使用的模型类
+# 不用django自带的用户认证 而是使用user模块里面自定义的模型类
+# 否则迁移文件会报错
+AUTH_USER_MODEL = 'user.User'
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -107,3 +113,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# 富文本编辑器配置
+TINYMCE_DEFAULT_CONFIG = {
+    'theme': 'advanced',
+    'width': 600,
+    'height': 400,
+}

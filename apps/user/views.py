@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
 from django.views.generic import View
 from django.http import HttpResponse
 from django.conf import settings
@@ -150,10 +151,17 @@ class RegisterView(View):
         # 加密用户的身份信息，生成激活token
         serializer = Serializer(settings.SECRET_KEY, 3600)
         info = {'confirm': user.id}
-        token = serializer.dump(info)
+        token = serializer.dumps(info)  # 默认是bytes形式需要解码
+        token = token.decode()
 
-        # 发邮件 pass
+        # 发邮件
+        subject = '天天生鲜欢迎您'
+        message = ''
+        sender = settings.EMAIL_FROM
+        receive = [email]
+        html_message = '<h1>%s, 欢迎您成为天天生鲜注册会员</h1>请点击下面链接激活您的账户<br/><a href="http://127.0.0.1:8000/user/active/%s" >http://127.0.0.1:8000/user/active/%s</a>' % (username, token, token)
 
+        send_mail(subject, message, sender, receive, html_message=html_message)
         # 返回应答 跳转到首页
         return redirect(reverse('goods:index'))
 

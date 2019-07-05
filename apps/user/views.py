@@ -154,14 +154,15 @@ class RegisterView(View):
         token = serializer.dumps(info)  # 默认是bytes形式需要解码
         token = token.decode()
 
-        # 发邮件
-        subject = '天天生鲜欢迎您'
-        message = ''
-        sender = settings.EMAIL_FROM
-        receive = [email]
-        html_message = '<h1>%s, 欢迎您成为天天生鲜注册会员</h1>请点击下面链接激活您的账户<br/><a href="http://127.0.0.1:8000/user/active/%s" >http://127.0.0.1:8000/user/active/%s</a>' % (username, token, token)
-
-        send_mail(subject, message, sender, receive, html_message=html_message)
+        # 发邮件 暂时不开启
+        # subject = '天天生鲜欢迎您'
+        # message = ''
+        # sender = settings.EMAIL_FROM
+        # receive = [email]
+        # html_message = '<h1>%s, 欢迎您成为天天生鲜注册会员</h1>请点击下面链接激活您的账户<br/><a href="http://127.0.0.1:8000/user/active/%s" >http://127.0.0.1:8000/user/active/%s</a>' % (username, token, token)
+        #
+        # # 这是一个阻塞的过程
+        # send_mail(subject, message, sender, receive, html_message=html_message)
         # 返回应答 跳转到首页
         return redirect(reverse('goods:index'))
 

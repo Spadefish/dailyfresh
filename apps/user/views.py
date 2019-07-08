@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
+from django.contrib.auth import authenticate, login
 from django.views.generic import View
 from django.http import HttpResponse
 from django.conf import settings
@@ -193,3 +194,22 @@ class LoginView(View):
     # 登录展示页
     def get(self, request):
         return render(request, 'login.html')
+
+    def post(self, request):
+        # 接收数据
+        username = request.POST.get('username')
+        password = request.POST.get('pwd')
+        if not all([username, password]):
+            return render(request, 'login.html', {'errmsg': '数据不完整'})
+
+        # 登录校验 django 自带登录模块
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                # 用户已激活 需要记录用户的登录状态
+                login(request, user)
+                return redirect(reverse('goods:index'))
+            else:
+                return render(request, 'login.html', {'errmsg': '该用户尚未激活'})
+        else:
+            return render(request, 'login.html', {'errmsg': '用户名或密码不正确'})

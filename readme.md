@@ -46,10 +46,10 @@
 
 **启动项目**
 
-python3 manage.py runserver
+**python3 manage.py runserver**
 
-**模型类到数据库的迁移**
+**模型类到数据库的迁移（这个操作只需要在数据库有变更的时候执行）**
 
-python3 manage.py makemigrations   // 生成数据库库的迁移文件
-python3 manage.py migrate // 执行迁移文件
-（这个操作只需要在数据库有变更的时候执行）
+**python3 manage.py makemigrations   // 生成数据库库的迁移文件**
+
+**python3 manage.py migrate // 执行迁移文件**
